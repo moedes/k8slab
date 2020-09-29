@@ -7,7 +7,8 @@ plan k8slab::setup (
   if ($action == 'apply') {
     run_task('terraform::initialize', $targets, 'dir' => '/Users/jerrymozes/projects/homelab_iac/Boltdir')
     run_plan('terraform::apply', 'dir' => '~/projects/homelab_iac/Boltdir', 'var' => {name => "${hostname}"})
-    $dnsserver = get_target('dns01.homelab.local')
+    $dnsserver = get_target('dnsserver')
+    $puppetserver = get_target('puppetserver')
     $references = {
         '_plugin'        => 'terraform',
         'dir'            => '~/projects/homelab_iac/Boltdir',
@@ -57,7 +58,7 @@ plan k8slab::setup (
 
     wait_until_available($alltargs, 'wait_time' => 300)
 
-    run_command('/opt/puppetlabs/bin/puppet config set server pmaster01.homelab.local --section main', $alltargs)
+    run_command("/opt/puppetlabs/bin/puppet config set server ${puppetserver.uri} --section main", $alltargs)
     run_command('/opt/puppetlabs/bin/puppet resource service puppet ensure=running enable=true', $alltargs)
     run_plan('reboot', $alltargs)
 
@@ -67,12 +68,12 @@ plan k8slab::setup (
   }
 
   if ($action == 'destroy'){
-    $dnsserver = get_target('dns01.homelab.local')
-    $master = get_target('pmaster01.homelab.local')
+    $dnsserver = get_target('dnsserver')
+    $puppetserver = get_target('puppetserver')
     get_targets('linux').each | $target | {
       $purge = "puppet node purge ${target.name}.puppet.demo"
       out::message($purge)
-      run_command($purge, $master)
+      run_command($purge, $puppetserver)
       run_command("Remove-DNSServerResourceRecord -Zonename puppet.demo -Name ${target.name} -RRType A -RecordData ${target.uri} -Force", $dnsserver)
     }
     run_plan('terraform::destroy', 'var' => {name => "${hostname}"})
