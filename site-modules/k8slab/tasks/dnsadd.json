@@ -1,0 +1,15 @@
+{
+    "description": "Add DNS Records to DNS",
+    "input_method": "powershell",
+    "parameters": {
+        "target":{
+            "description": "The target to add to DNS.",
+            "type": "String"
+        },
+        "ip":{
+            "description": "The ip address to add to DNS",
+            "type": "String"
+        }
+           
+    }
+}

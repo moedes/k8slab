@@ -1,0 +1,7 @@
+*.tfvars
+inventory.yaml
+bolt-debug.log
+*.tfstate
+terraform.tfstate.backup
+.terraform/plugins/selections.json
+.terraform/plugins/registry.terraform.io/hashicorp/vsphere/1.22.0/darwin_amd64/terraform-provider-vsphere_v1.22.0_x4
