@@ -1,12 +1,13 @@
 plan k8slab::setup (
     TargetSpec $targets,
     Optional[String] $action = 'apply',
-    Optional[String] $hostname
+    Optional[String] $hostname,
+    Optional[String] $instances = undef,
 ) {
 
   if ($action == 'apply') {
     run_task('terraform::initialize', $targets, 'dir' => '/Users/jerrymozes/projects/homelab_iac/Boltdir')
-    run_plan('terraform::apply', 'dir' => '~/projects/homelab_iac/Boltdir', 'var' => {name => "${hostname}"})
+    run_plan('terraform::apply', 'dir' => '~/projects/homelab_iac/Boltdir', 'var' => {name => "${hostname}", instances => "${instances}"})
     $dnsserver = get_target('dnsserver')
     $puppetserver = get_target('puppetserver')
     $references = {
@@ -53,7 +54,12 @@ plan k8slab::setup (
 
     wait_until_available($alltargs, 'wait_time' => 300, '_catch_errors' => true)
 
-    apply_prep($alltargs)
+    $install_uri = 'https://pmaster01.homelab.local:8140/packages/current/install.bash'
+    $install_cmd = 'curl --insecure "https://pmaster01.homelab.local:8140/packages/current/install.bash" | sudo bash -s extension_requests:pp_role=rke'
+
+    run_command($install_cmd, $alltargs)
+    # ctrl::sleep(180)
+    # apply_prep($alltargs)
     #run_task('puppet_agent::install', $lin_targets)
 
     wait_until_available($alltargs, 'wait_time' => 300)
