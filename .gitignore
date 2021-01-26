@@ -1,3 +1,4 @@
+.rerun.json
 *.tfvars
 inventory.yaml
 bolt-debug.log

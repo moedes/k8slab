@@ -6,13 +6,13 @@ plan k8slab::setup (
 ) {
 
   if ($action == 'apply') {
-    run_task('terraform::initialize', $targets, 'dir' => '/Users/jerrymozes/projects/homelab_iac/Boltdir')
-    run_plan('terraform::apply', 'dir' => '~/projects/homelab_iac/Boltdir', 'var' => {name => "${hostname}", instances => "${instances}"})
+    run_task('terraform::initialize', $targets, 'dir' => '/Users/jerrymozes/code/homelab_iac/Boltdir')
+    run_plan('terraform::apply', 'dir' => '~/code/homelab_iac/Boltdir', 'var' => {name => "${hostname}", instances => "${instances}"})
     $dnsserver = get_target('dnsserver')
     $puppetserver = get_target('puppetserver')
     $references = {
         '_plugin'        => 'terraform',
-        'dir'            => '~/projects/homelab_iac/Boltdir',
+        'dir'            => '~/code/homelab_iac/Boltdir',
         'resource_type'  => 'vsphere_virtual_machine.linux',
         'target_mapping' => {
             'uri' => 'default_ip_address',
@@ -26,7 +26,7 @@ plan k8slab::setup (
     }
     $nginxref = {
         '_plugin'        => 'terraform',
-        'dir'            => '~/projects/homelab_iac/Boltdir',
+        'dir'            => '~/code/homelab_iac/Boltdir',
         'resource_type'  => 'vsphere_virtual_machine.nginx',
         'target_mapping' => {
             'uri' => 'default_ip_address',
